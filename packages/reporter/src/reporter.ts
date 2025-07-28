@@ -21,7 +21,7 @@ export class SimplePw implements Reporter {
       projectName: 'default',
       ...options,
     };
-    this.runId = `run_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    this.runId = this.generateId('run');
   }
 
   onBegin(_config: FullConfig, _suite: Suite): void {
@@ -35,7 +35,7 @@ export class SimplePw implements Reporter {
     if (!this.config.enabled) return;
 
     const testResult: TestResultData = {
-      id: `test_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      id: this.generateId('test'),
       runId: this.runId,
       testName: test.title,
       fileName: test.location.file,
@@ -76,6 +76,10 @@ export class SimplePw implements Reporter {
     } else {
       console.log('📝 API URL not configured, results not sent');
     }
+  }
+
+  private generateId(prefix: string): string {
+    return `${prefix}_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
   }
 
   private mapTestStatus(status: string): 'passed' | 'failed' | 'skipped' | 'timedOut' {
