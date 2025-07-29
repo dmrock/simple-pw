@@ -17,8 +17,10 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "composite": true
   },
-  "include": ["packages/**/*"],
+  "references": [{ "path": "./packages/reporter" }],
+  "files": [],
   "exclude": ["node_modules", "dist"]
 }
