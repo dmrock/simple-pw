@@ -20,7 +20,10 @@
     "isolatedModules": true,
     "composite": true
   },
-  "references": [{ "path": "./packages/reporter" }],
+  "references": [
+    { "path": "./packages/reporter" },
+    { "path": "./packages/api" }
+  ],
   "files": [],
   "exclude": ["node_modules", "dist"]
 }
