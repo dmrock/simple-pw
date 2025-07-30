@@ -1,0 +1,29 @@
+{
+  "name": "@simple-pw/api",
+  "version": "0.1.0",
+  "description": "Backend API for Simple Playwright Reporter",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "lint": "eslint src --ext .ts",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:migrate": "prisma migrate dev",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.3.0",
+    "fastify": "^5.2.0",
+    "@fastify/cors": "^10.0.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "prisma": "^6.3.0",
+    "tsx": "^4.19.3",
+    "typescript": "^5.7.3"
+  }
+}
