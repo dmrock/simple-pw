@@ -9,7 +9,7 @@ export default defineConfig({
   reporter: [
     ['list'],
     [
-      '@simple-pw/reporter',
+      '../../packages/reporter/dist/index.js',
       {
         projectName: 'demo-app',
         apiUrl: process.env.API_URL || 'http://localhost:3001',
@@ -18,7 +18,6 @@ export default defineConfig({
     ],
   ],
   use: {
-    baseURL: 'http://localhost:3000',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
   },
