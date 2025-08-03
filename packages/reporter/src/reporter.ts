@@ -26,7 +26,7 @@ export class SimplePw implements Reporter {
 
   onBegin(_config: FullConfig, _suite: Suite): void {
     if (!this.config.enabled) return;
-    
+
     console.log(`🚀 Starting test run: ${this.runId}`);
     console.log(`📊 Reporter API: ${this.config.apiUrl || 'disabled'}`);
   }
@@ -43,11 +43,11 @@ export class SimplePw implements Reporter {
       duration: result.duration,
       retry: result.retry,
       screenshots: result.attachments
-        .filter(a => a.name === 'screenshot')
-        .map(a => a.path || ''),
+        .filter((a) => a.name === 'screenshot')
+        .map((a) => a.path || ''),
       videos: result.attachments
-        .filter(a => a.name === 'video')
-        .map(a => a.path || ''),
+        .filter((a) => a.name === 'video')
+        .map((a) => a.path || ''),
     };
 
     if (result.error?.message) {
@@ -70,7 +70,7 @@ export class SimplePw implements Reporter {
 
     console.log(`✅ Test run completed: ${result.status}`);
     console.log(`📈 Total tests: ${this.testResults.length}`);
-    
+
     if (this.config.apiUrl) {
       await this.sendResults(runData);
     } else {
@@ -82,7 +82,9 @@ export class SimplePw implements Reporter {
     return `${prefix}_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`;
   }
 
-  private mapTestStatus(status: string): 'passed' | 'failed' | 'skipped' | 'timedOut' {
+  private mapTestStatus(
+    status: string
+  ): 'passed' | 'failed' | 'skipped' | 'timedOut' {
     switch (status) {
       case 'passed':
         return 'passed';
@@ -117,7 +119,7 @@ export class SimplePw implements Reporter {
   private async sendResults(runData: TestRunData): Promise<void> {
     try {
       console.log(`📤 Sending results to ${this.config.apiUrl}`);
-      
+
       const payload = {
         run: {
           ...runData,
@@ -125,8 +127,6 @@ export class SimplePw implements Reporter {
         },
         results: this.testResults,
       };
-
-      console.log('🔍 Payload being sent:', JSON.stringify(payload, null, 2));
 
       await axios.post(`${this.config.apiUrl}/api/test-runs`, payload, {
         timeout: this.config.timeout || 10000,

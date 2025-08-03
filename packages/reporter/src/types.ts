@@ -18,8 +18,8 @@ export interface TestResultData {
   duration: number;
   error?: string;
   retry: number;
-  screenshots?: string[];
-  videos?: string[];
+  screenshots: string[];
+  videos: string[];
 }
 
 export interface ReporterConfig {
