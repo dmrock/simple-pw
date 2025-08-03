@@ -1,16 +1,15 @@
 import { defineConfig } from '@playwright/test';
-import { SimplePw } from '@simple-pw/reporter';
 
 export default defineConfig({
   testDir: './tests',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: process.env.CI ? 1 : 4,
   reporter: [
     ['list'],
     [
-      SimplePw,
+      '@simple-pw/reporter',
       {
         projectName: 'demo-app',
         apiUrl: process.env.API_URL || 'http://localhost:3001',

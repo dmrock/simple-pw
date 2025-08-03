@@ -22,7 +22,8 @@
   },
   "references": [
     { "path": "./packages/reporter" },
-    { "path": "./packages/api" }
+    { "path": "./packages/api" },
+    { "path": "./apps/demo" }
   ],
   "files": [],
   "exclude": ["node_modules", "dist"]
