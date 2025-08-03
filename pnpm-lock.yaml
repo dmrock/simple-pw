@@ -36,6 +36,15 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
 
+  apps/demo:
+    devDependencies:
+      '@playwright/test':
+        specifier: ^1.54.1
+        version: 1.54.1
+      '@simple-pw/reporter':
+        specifier: workspace:*
+        version: link:../../packages/reporter
+
   packages/api:
     dependencies:
       '@fastify/cors':
