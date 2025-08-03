@@ -1,5 +1,5 @@
 import { FastifyInstance } from 'fastify';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import { Prisma } from '@prisma/client';
 
 // Validation schemas
@@ -21,7 +21,7 @@ const testRunSchema = z.object({
   projectName: z.string(),
   branch: z.string().optional(),
   commit: z.string().optional(),
-  timestamp: z.string().transform(str => new Date(str)),
+  timestamp: z.string().transform((str) => new Date(str)),
   status: z.enum(['passed', 'failed', 'skipped']),
   duration: z.number(),
   metadata: z.record(z.unknown()).optional(),
@@ -36,10 +36,17 @@ export async function testRunsRoutes(fastify: FastifyInstance) {
   // Create new test run with results
   fastify.post('/test-runs', async (request, reply) => {
     try {
+      console.log(
+        '📥 Received request body:',
+        JSON.stringify(request.body, null, 2)
+      );
+
       const { run, results } = createTestRunSchema.parse(request.body);
 
       // Convert metadata to Prisma's JsonValue type, ensuring null instead of undefined
-      const metadata: Prisma.InputJsonValue | Prisma.NullableJsonNullValueInput = run.metadata 
+      const metadata:
+        | Prisma.InputJsonValue
+        | Prisma.NullableJsonNullValueInput = run.metadata
         ? (run.metadata as Prisma.InputJsonValue)
         : Prisma.DbNull;
 
@@ -55,7 +62,7 @@ export async function testRunsRoutes(fastify: FastifyInstance) {
           duration: run.duration,
           metadata: metadata,
           results: {
-            create: results.map(result => ({
+            create: results.map((result) => ({
               id: result.id,
               testName: result.testName,
               fileName: result.fileName,
@@ -65,18 +72,28 @@ export async function testRunsRoutes(fastify: FastifyInstance) {
               retry: result.retry,
               screenshots: result.screenshots,
               videos: result.videos,
-            }))
-          }
+            })),
+          },
         },
         include: {
-          results: true
-        }
+          results: true,
+        },
       });
 
       reply.code(201).send(savedRun);
     } catch (error) {
+      console.error('❌ Validation error:', error);
       fastify.log.error(error);
-      reply.code(400).send({ error: 'Invalid request data' });
+
+      // If it's a Zod validation error, return detailed info
+      if (error instanceof ZodError) {
+        reply.code(400).send({
+          error: 'Validation failed',
+          details: error.issues,
+        });
+      } else {
+        reply.code(400).send({ error: 'Invalid request data' });
+      }
     }
   });
 
@@ -89,14 +106,14 @@ export async function testRunsRoutes(fastify: FastifyInstance) {
     const { page = '1', limit = '20' } = request.query as TestRunsQuery;
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 20;
-    
+
     const runs = await fastify.prisma.testRun.findMany({
       skip: (pageNum - 1) * limitNum,
       take: limitNum,
       orderBy: { timestamp: 'desc' },
       include: {
-        results: true
-      }
+        results: true,
+      },
     });
 
     reply.send(runs);
@@ -105,12 +122,12 @@ export async function testRunsRoutes(fastify: FastifyInstance) {
   // Get specific test run
   fastify.get('/test-runs/:id', async (request, reply) => {
     const { id } = request.params as { id: string };
-    
+
     const run = await fastify.prisma.testRun.findUnique({
       where: { id },
       include: {
-        results: true
-      }
+        results: true,
+      },
     });
 
     if (!run) {
