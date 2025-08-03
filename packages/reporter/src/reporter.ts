@@ -119,9 +119,14 @@ export class SimplePw implements Reporter {
       console.log(`📤 Sending results to ${this.config.apiUrl}`);
       
       const payload = {
-        run: runData,
+        run: {
+          ...runData,
+          timestamp: runData.timestamp.toISOString(), // Convert Date to ISO string
+        },
         results: this.testResults,
       };
+
+      console.log('🔍 Payload being sent:', JSON.stringify(payload, null, 2));
 
       await axios.post(`${this.config.apiUrl}/api/test-runs`, payload, {
         timeout: this.config.timeout || 10000,
