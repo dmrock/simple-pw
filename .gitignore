@@ -20,7 +20,8 @@ yarn-debug.log*
 .eslintcache
 
 # AI instructions and specs
-.kiro/
+.kiro
+.vscode
 
 # Test results
 test-results/

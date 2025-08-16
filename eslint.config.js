@@ -20,6 +20,13 @@ export default [
         __filename: 'readonly',
         global: 'readonly',
         crypto: 'readonly',
+        // DOM globals for web packages
+        document: 'readonly',
+        window: 'readonly',
+        navigator: 'readonly',
+        localStorage: 'readonly',
+        sessionStorage: 'readonly',
+        fetch: 'readonly',
       },
     },
     plugins: {
@@ -27,7 +34,10 @@ export default [
     },
     rules: {
       ...tsPlugin.configs.recommended.rules,
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        { argsIgnorePattern: '^_' },
+      ],
       'no-undef': 'error',
     },
   },

@@ -23,6 +23,7 @@
   "references": [
     { "path": "./packages/reporter" },
     { "path": "./packages/api" },
+    { "path": "./packages/web" },
     { "path": "./apps/demo" }
   ],
   "files": [],
