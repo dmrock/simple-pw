@@ -1,83 +1,83 @@
 # Simple PW Web Dashboard
 
-Веб-интерфейс для Simple Playwright Reporter - современный dashboard для просмотра и анализа результатов Playwright тестов.
+Modern web interface for Simple Playwright Reporter - a comprehensive dashboard for viewing and analyzing Playwright test results.
 
-## Технологический стек
+## Technology Stack
 
-- **React 18** с TypeScript
-- **Vite** для сборки и разработки
-- **Tailwind CSS** для стилизации
-- **TanStack Query** для управления server state
-- **Zustand** для client state
-- **React Router** для маршрутизации
-- **Axios** для HTTP запросов
-- **Recharts** для графиков и визуализации
+- **React 18** with TypeScript
+- **Vite** for build and development
+- **Tailwind CSS** for styling
+- **TanStack Query** for server state management
+- **Zustand** for client state management
+- **React Router** for routing
+- **Axios** for HTTP requests
+- **Recharts** for charts and visualization
 
-## Разработка
+## Development
 
-### Установка зависимостей
+### Install dependencies
 
 ```bash
 pnpm install
 ```
 
-### Запуск в режиме разработки
+### Start development server
 
 ```bash
 pnpm dev
 ```
 
-Приложение будет доступно по адресу http://localhost:3000
+Application will be available at http://localhost:3000
 
-### Сборка для продакшена
+### Build for production
 
 ```bash
 pnpm build
 ```
 
-### Проверка типов
+### Type checking
 
 ```bash
 pnpm type-check
 ```
 
-### Линтинг
+### Linting
 
 ```bash
 pnpm lint
 ```
 
-## Конфигурация
+## Configuration
 
-Скопируйте `.env.example` в `.env` и настройте переменные окружения:
+Copy `.env.example` to `.env` and configure environment variables:
 
 ```bash
 cp .env.example .env
 ```
 
-### Переменные окружения
+### Environment Variables
 
-- `VITE_API_URL` - URL API сервера (по умолчанию: http://localhost:8080)
-- `VITE_DEV_MODE` - Режим разработки (true/false)
+- `VITE_API_URL` - API server URL (default: http://localhost:8080)
+- `VITE_DEV_MODE` - Development mode (true/false)
 
-## Структура проекта
+## Project Structure
 
 ```
 src/
-├── components/          # Переиспользуемые компоненты
-│   ├── ui/             # Базовые UI элементы
-│   ├── layout/         # Layout компоненты
-│   └── features/       # Feature-specific компоненты
-├── pages/              # Страницы приложения
+├── components/          # Reusable components
+│   ├── ui/             # Base UI elements
+│   ├── layout/         # Layout components
+│   └── features/       # Feature-specific components
+├── pages/              # Application pages
 ├── hooks/              # Custom React hooks
-├── services/           # API сервисы
-├── types/              # TypeScript типы
-├── utils/              # Утилиты
+├── services/           # API services
+├── types/              # TypeScript types
+├── utils/              # Utilities
 ├── stores/             # Zustand stores
-├── config/             # Конфигурация
-└── App.tsx             # Главный компонент
+├── config/             # Configuration
+└── App.tsx             # Main component
 ```
 
-## Интеграция с API
+## API Integration
 
-Веб-интерфейс взаимодействует с Fastify API сервером через REST endpoints. Убедитесь, что API сервер запущен на порту 8080 (или настройте `VITE_API_URL` соответственно).
+The web interface communicates with the Fastify API server through REST endpoints. Make sure the API server is running on port 8080 (or configure `VITE_API_URL` accordingly).
