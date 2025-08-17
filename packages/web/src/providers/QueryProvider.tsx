@@ -10,9 +10,13 @@ const queryClient = new QueryClient({
       // Global defaults for all queries
       staleTime: 30 * 1000, // 30 seconds
       gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
-      retry: (failureCount, error: any) => {
+      retry: (failureCount, error: Error) => {
         // Don't retry on 4xx errors (client errors)
-        if (error?.code?.startsWith('HTTP_4')) {
+        if (
+          'code' in error &&
+          typeof error.code === 'string' &&
+          error.code.startsWith('HTTP_4')
+        ) {
           return false;
         }
         // Retry up to 3 times for other errors

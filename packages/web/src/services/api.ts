@@ -50,9 +50,11 @@ apiClient.interceptors.response.use(
     if (error.response) {
       // Server responded with error status
       const { status, data } = error.response;
-      apiError.message = (data as any)?.message || `HTTP ${status} Error`;
-      apiError.code = (data as any)?.code || `HTTP_${status}`;
-      apiError.details = data as Record<string, unknown>;
+      const errorData = data as Record<string, unknown>;
+      apiError.message =
+        (errorData?.message as string) || `HTTP ${status} Error`;
+      apiError.code = (errorData?.code as string) || `HTTP_${status}`;
+      apiError.details = errorData;
     } else if (error.request) {
       // Request was made but no response received
       apiError.message = 'Network error - please check your connection';

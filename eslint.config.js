@@ -27,6 +27,7 @@ export default [
         localStorage: 'readonly',
         sessionStorage: 'readonly',
         fetch: 'readonly',
+        URLSearchParams: 'readonly',
       },
     },
     plugins: {
