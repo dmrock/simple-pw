@@ -1,21 +1,21 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { QueryProvider } from './providers/QueryProvider';
+import { AppLayout } from './components/layout/AppLayout';
+import { Dashboard, TestRuns, TestRunDetails, Analytics } from './pages';
 
 function App() {
   return (
     <QueryProvider>
-      <div className="min-h-screen bg-gray-100">
-        <div className="container mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">
-            Simple PW Dashboard
-          </h1>
-          <div className="bg-white rounded-lg shadow p-6">
-            <p className="text-gray-600">
-              Welcome to the Simple Playwright Dashboard. The application is
-              ready for development.
-            </p>
-          </div>
-        </div>
-      </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<AppLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="runs" element={<TestRuns />} />
+            <Route path="runs/:id" element={<TestRunDetails />} />
+            <Route path="analytics" element={<Analytics />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
     </QueryProvider>
   );
 }
