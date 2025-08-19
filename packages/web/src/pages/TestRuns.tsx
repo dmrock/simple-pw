@@ -41,7 +41,7 @@ export function TestRuns() {
   const handleSort = (key: string) => {
     setFilters((prev) => ({
       ...prev,
-      sortBy: key as any,
+      sortBy: key as 'createdAt' | 'duration' | 'projectName' | 'status',
       sortOrder:
         prev.sortBy === key && prev.sortOrder === 'asc' ? 'desc' : 'asc',
       page: 1, // Reset to page 1 when sorting changes
@@ -65,11 +65,11 @@ export function TestRuns() {
 
   // Auto-refresh every 30 seconds
   useEffect(() => {
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       refetch();
     }, 30000);
 
-    return () => clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, [refetch]);
 
   return (

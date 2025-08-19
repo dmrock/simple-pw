@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, X } from 'lucide-react';
+import { Search, X, LucideIcon } from 'lucide-react';
 
 export interface SearchInputProps {
   value: string;
@@ -8,6 +8,7 @@ export interface SearchInputProps {
   className?: string;
   disabled?: boolean;
   onClear?: () => void;
+  icon?: LucideIcon;
 }
 
 const SearchInput: React.FC<SearchInputProps> = ({
@@ -17,6 +18,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   className = '',
   disabled = false,
   onClear,
+  icon: Icon = Search,
 }) => {
   const handleClear = () => {
     onChange('');
@@ -26,7 +28,7 @@ const SearchInput: React.FC<SearchInputProps> = ({
   return (
     <div className={`relative ${className}`}>
       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <Search className="h-4 w-4 text-gray-400" />
+        <Icon className="h-4 w-4 text-gray-400" />
       </div>
       <input
         type="text"
