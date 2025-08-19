@@ -4,6 +4,12 @@ export type { ButtonProps } from './Button';
 export { LoadingSpinner } from './LoadingSpinner';
 export type { LoadingSpinnerProps } from './LoadingSpinner';
 
+export { Pagination } from './Pagination';
+export type { PaginationProps } from './Pagination';
+
+export { SearchInput } from './SearchInput';
+export type { SearchInputProps } from './SearchInput';
+
 export { StatusBadge } from './StatusBadge';
 export type { StatusBadgeProps, TestStatus } from './StatusBadge';
 

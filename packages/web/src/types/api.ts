@@ -1,6 +1,6 @@
 // Core API types based on the existing database schema and API responses
 
-export interface TestRun {
+export interface TestRun extends Record<string, unknown> {
   id: string;
   projectName: string;
   branch?: string;

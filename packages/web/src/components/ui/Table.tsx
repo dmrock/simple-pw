@@ -15,14 +15,14 @@ export interface TableColumn<T = Record<string, unknown>> {
 export interface TableProps<T = Record<string, unknown>> {
   columns: TableColumn<T>[];
   data: T[];
-  sortBy?: string;
-  sortDirection?: 'asc' | 'desc';
-  onSort?: (key: string) => void;
+  sortBy?: string | undefined;
+  sortDirection?: 'asc' | 'desc' | undefined;
+  onSort?: ((key: string) => void) | undefined;
   loading?: boolean;
   emptyMessage?: string;
   className?: string;
-  rowClassName?: (row: T, index: number) => string;
-  onRowClick?: (row: T, index: number) => void;
+  rowClassName?: ((row: T, index: number) => string) | undefined;
+  onRowClick?: ((row: T, index: number) => void) | undefined;
 }
 
 const Table = <T extends Record<string, unknown>>({
@@ -49,9 +49,9 @@ const Table = <T extends Record<string, unknown>>({
     }
 
     return sortDirection === 'asc' ? (
-      <ChevronUp className="h-4 w-4 text-gray-600" />
+      <ChevronUp className="h-4 w-4 text-gray-200" />
     ) : (
-      <ChevronDown className="h-4 w-4 text-gray-600" />
+      <ChevronDown className="h-4 w-4 text-gray-200" />
     );
   };
 
@@ -66,7 +66,7 @@ const Table = <T extends Record<string, unknown>>({
   };
 
   const getRowClasses = (row: T, index: number) => {
-    const baseClasses = 'hover:bg-gray-50 transition-colors';
+    const baseClasses = 'hover:bg-gray-700 transition-colors';
     const clickableClasses = onRowClick ? 'cursor-pointer' : '';
     const customClasses = rowClassName ? rowClassName(row, index) : '';
 
@@ -78,15 +78,15 @@ const Table = <T extends Record<string, unknown>>({
   if (loading) {
     return (
       <div
-        className={`overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg ${className}`}
+        className={`overflow-hidden shadow ring-1 ring-gray-700 md:rounded-lg ${className}`}
       >
-        <div className="min-w-full divide-y divide-gray-300">
-          <div className="bg-gray-50 px-6 py-3">
-            <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+        <div className="min-w-full divide-y divide-gray-700">
+          <div className="bg-gray-700 px-6 py-3">
+            <div className="h-4 bg-gray-600 rounded animate-pulse"></div>
           </div>
           {[...Array(5)].map((_, i) => (
-            <div key={i} className="bg-white px-6 py-4">
-              <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
+            <div key={i} className="bg-gray-800 px-6 py-4">
+              <div className="h-4 bg-gray-600 rounded animate-pulse"></div>
             </div>
           ))}
         </div>
@@ -96,24 +96,24 @@ const Table = <T extends Record<string, unknown>>({
 
   return (
     <div
-      className={`overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg ${className}`}
+      className={`overflow-hidden shadow ring-1 ring-gray-700 md:rounded-lg ${className}`}
     >
       <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-300">
-          <thead className="bg-gray-50">
+        <table className="min-w-full divide-y divide-gray-700">
+          <thead className="bg-gray-700">
             <tr>
               {columns.map((column) => (
                 <th
                   key={column.key}
                   scope="col"
-                  className={`px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                  className={`px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider ${
                     column.hideOnMobile ? 'hidden sm:table-cell' : ''
                   } ${column.headerClassName || ''}`}
                   style={column.width ? { width: column.width } : undefined}
                 >
                   {column.sortable ? (
                     <button
-                      className="group inline-flex items-center space-x-1 hover:text-gray-700"
+                      className="group inline-flex items-center space-x-1 hover:text-gray-100"
                       onClick={() => handleSort(column.key)}
                     >
                       <span>{column.header}</span>
@@ -126,12 +126,12 @@ const Table = <T extends Record<string, unknown>>({
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-gray-800 divide-y divide-gray-700">
             {data.length === 0 ? (
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-6 py-12 text-center text-sm text-gray-500"
+                  className="px-6 py-12 text-center text-sm text-gray-400"
                 >
                   {emptyMessage}
                 </td>
@@ -148,7 +148,7 @@ const Table = <T extends Record<string, unknown>>({
                   {columns.map((column) => (
                     <td
                       key={column.key}
-                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${
+                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-300 ${
                         column.hideOnMobile ? 'hidden sm:table-cell' : ''
                       } ${column.className || ''}`}
                     >

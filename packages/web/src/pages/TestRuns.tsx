@@ -1,74 +1,140 @@
+import { useState, useEffect, useMemo } from 'react';
+import { RefreshCw } from 'lucide-react';
+import { useTestRuns } from '../hooks/useApi';
+import { FilterBar } from '../components/features/FilterBar';
+import { TestRunsList } from '../components/features/TestRunsList';
+import { Button, LoadingSpinner } from '../components/ui';
+import type { TestRunFilters } from '../types/api';
+
 export function TestRuns() {
+  const [filters, setFilters] = useState<TestRunFilters>({
+    page: 1,
+    limit: 20,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+  });
+
+  const { data, isLoading, error, refetch } = useTestRuns(filters);
+
+  // Extract unique project names for filter options
+  const projectOptions = useMemo(() => {
+    if (!data?.data) return [];
+
+    const projects = new Set(data.data.map((run) => run.projectName));
+    return Array.from(projects).sort();
+  }, [data?.data]);
+
+  // Handle filter changes
+  const handleFiltersChange = (newFilters: TestRunFilters) => {
+    setFilters({
+      ...newFilters,
+      page: newFilters.page || 1, // Reset to page 1 when filters change
+    });
+  };
+
+  // Handle pagination
+  const handlePageChange = (page: number) => {
+    setFilters((prev) => ({ ...prev, page }));
+  };
+
+  // Handle sorting
+  const handleSort = (key: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      sortBy: key as any,
+      sortOrder:
+        prev.sortBy === key && prev.sortOrder === 'asc' ? 'desc' : 'asc',
+      page: 1, // Reset to page 1 when sorting changes
+    }));
+  };
+
+  // Handle manual refresh
+  const handleRefresh = () => {
+    refetch();
+  };
+
+  // Reset filters
+  const handleResetFilters = () => {
+    setFilters({
+      page: 1,
+      limit: 20,
+      sortBy: 'createdAt',
+      sortOrder: 'desc',
+    });
+  };
+
+  // Auto-refresh every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetch();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [refetch]);
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Test Runs</h1>
+        <Button
+          onClick={handleRefresh}
+          disabled={isLoading}
+          variant="secondary"
+          size="sm"
+          className="flex items-center gap-2"
+        >
+          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
+          Refresh
+        </Button>
       </div>
 
-      {/* Filter Bar Placeholder */}
-      <div className="bg-gray-800 rounded-lg shadow-lg p-4 border border-gray-700">
-        <div className="flex flex-col sm:flex-row gap-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Search by project name or ID..."
-              className="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <div className="flex gap-2">
-            <select className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">All Projects</option>
-            </select>
-            <select className="px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-              <option value="">All Statuses</option>
-              <option value="passed">Passed</option>
-              <option value="failed">Failed</option>
-              <option value="skipped">Skipped</option>
-            </select>
-          </div>
-        </div>
-      </div>
+      {/* Filter Bar */}
+      <FilterBar
+        filters={filters}
+        onFiltersChange={handleFiltersChange}
+        onReset={handleResetFilters}
+        projectOptions={projectOptions}
+        loading={isLoading}
+      />
 
-      {/* Test Runs List Placeholder */}
-      <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-        <div className="px-6 py-4 border-b border-gray-700">
-          <h2 className="text-lg font-medium text-white">Test Runs</h2>
+      {/* Error State */}
+      {error && (
+        <div className="bg-red-900/20 border border-red-500/50 rounded-lg p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-red-400 font-medium">
+                Error loading test runs
+              </h3>
+              <p className="text-red-300 text-sm mt-1">
+                {error.message || 'An unexpected error occurred'}
+              </p>
+            </div>
+            <Button onClick={handleRefresh} variant="secondary" size="sm">
+              Try Again
+            </Button>
+          </div>
         </div>
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-700">
-            <thead className="bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  ID
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Project
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Status
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Duration
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
-                  Tests
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-gray-800 divide-y divide-gray-700">
-              <tr>
-                <td colSpan={6} className="px-6 py-8 text-center text-gray-400">
-                  No test runs found. Test runs will be displayed here once data
-                  is loaded.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+      )}
+
+      {/* Loading State (initial load) */}
+      {isLoading && !data && (
+        <div className="flex items-center justify-center py-12">
+          <LoadingSpinner size="lg" />
         </div>
-      </div>
+      )}
+
+      {/* Test Runs List */}
+      {(data || (!isLoading && !error)) && (
+        <TestRunsList
+          data={data || undefined}
+          loading={isLoading}
+          onPageChange={handlePageChange}
+          onSort={handleSort}
+          sortBy={filters.sortBy}
+          sortDirection={filters.sortOrder}
+        />
+      )}
     </div>
   );
 }

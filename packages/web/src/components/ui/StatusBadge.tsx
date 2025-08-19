@@ -20,22 +20,22 @@ const StatusBadge: React.FC<StatusBadgeProps> = ({
     passed: {
       label: 'Passed',
       icon: CheckCircle,
-      classes: 'bg-green-100 text-green-800 border-green-200',
+      classes: 'bg-green-900/30 text-green-400 border-green-500/50',
     },
     failed: {
       label: 'Failed',
       icon: XCircle,
-      classes: 'bg-red-100 text-red-800 border-red-200',
+      classes: 'bg-red-900/30 text-red-400 border-red-500/50',
     },
     skipped: {
       label: 'Skipped',
       icon: Minus,
-      classes: 'bg-gray-100 text-gray-800 border-gray-200',
+      classes: 'bg-gray-700/50 text-gray-400 border-gray-500/50',
     },
     timedOut: {
       label: 'Timed Out',
       icon: Clock,
-      classes: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+      classes: 'bg-yellow-900/30 text-yellow-400 border-yellow-500/50',
     },
   };
 
