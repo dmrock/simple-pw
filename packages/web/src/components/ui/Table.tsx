@@ -1,18 +1,18 @@
 import React from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 
-export interface TableColumn<T = any> {
+export interface TableColumn<T = Record<string, unknown>> {
   key: string;
   header: string;
   sortable?: boolean;
-  render?: (value: any, row: T) => React.ReactNode;
+  render?: (value: unknown, row: T) => React.ReactNode;
   className?: string;
   headerClassName?: string;
   width?: string;
   hideOnMobile?: boolean;
 }
 
-export interface TableProps<T = any> {
+export interface TableProps<T = Record<string, unknown>> {
   columns: TableColumn<T>[];
   data: T[];
   sortBy?: string;
@@ -25,7 +25,7 @@ export interface TableProps<T = any> {
   onRowClick?: (row: T, index: number) => void;
 }
 
-const Table = <T extends Record<string, any>>({
+const Table = <T extends Record<string, unknown>>({
   columns,
   data,
   sortBy,
@@ -55,14 +55,14 @@ const Table = <T extends Record<string, any>>({
     );
   };
 
-  const renderCellValue = (column: TableColumn<T>, row: T) => {
+  const renderCellValue = (column: TableColumn<T>, row: T): React.ReactNode => {
     const value = row[column.key];
 
     if (column.render) {
       return column.render(value, row);
     }
 
-    return value;
+    return value as React.ReactNode;
   };
 
   const getRowClasses = (row: T, index: number) => {
