@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Search, Filter, SortAsc, SortDesc } from 'lucide-react';
 import { TestResultItem } from './TestResultItem';
 import { Button } from '../ui/Button';

@@ -1,4 +1,3 @@
-import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 import { Calendar, Clock, GitBranch, GitCommit, Package } from 'lucide-react';
 import { StatusBadge } from '../ui/StatusBadge';
