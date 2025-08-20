@@ -77,12 +77,12 @@ export function DateRangePicker({
     <div className={`relative ${className}`}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+        className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors touch-manipulation"
       >
-        <Calendar className="h-4 w-4" />
-        <span className="text-sm">{displayLabel}</span>
+        <Calendar className="h-4 w-4 flex-shrink-0" />
+        <span className="text-xs sm:text-sm truncate">{displayLabel}</span>
         <ChevronDown
-          className={`h-4 w-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`h-3 sm:h-4 w-3 sm:w-4 transition-transform flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
 
@@ -95,13 +95,13 @@ export function DateRangePicker({
           />
 
           {/* Dropdown */}
-          <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-600 rounded-md shadow-lg z-20">
+          <div className="absolute right-0 mt-2 w-40 sm:w-48 bg-gray-800 border border-gray-600 rounded-md shadow-lg z-20">
             <div className="py-1">
               {presetOptions.map((preset) => (
                 <button
                   key={preset.value}
                   onClick={() => handlePresetSelect(preset)}
-                  className={`w-full text-left px-4 py-2 text-sm hover:bg-gray-700 transition-colors ${
+                  className={`w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm hover:bg-gray-700 transition-colors touch-manipulation ${
                     selectedPreset === preset.value
                       ? 'text-blue-400 bg-gray-700'
                       : 'text-white'
@@ -117,7 +117,7 @@ export function DateRangePicker({
               {/* Custom range option (placeholder for future enhancement) */}
               <button
                 onClick={() => setIsOpen(false)}
-                className="w-full text-left px-4 py-2 text-sm text-gray-400 hover:bg-gray-700 transition-colors"
+                className="w-full text-left px-3 sm:px-4 py-2 text-xs sm:text-sm text-gray-400 hover:bg-gray-700 transition-colors touch-manipulation"
                 disabled
               >
                 Custom range (coming soon)

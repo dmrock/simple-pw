@@ -50,7 +50,7 @@ const Modal: React.FC<ModalProps> = ({
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex min-h-full items-center justify-center p-4 text-center">
+          <div className="flex min-h-full items-center justify-center p-2 sm:p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
@@ -61,14 +61,14 @@ const Modal: React.FC<ModalProps> = ({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
-                className={`w-full ${sizeClasses[size]} transform overflow-hidden rounded-2xl bg-gray-800 p-6 text-left align-middle shadow-xl transition-all border border-gray-700`}
+                className={`w-full ${sizeClasses[size]} transform overflow-hidden rounded-lg sm:rounded-2xl bg-gray-800 p-4 sm:p-6 text-left align-middle shadow-xl transition-all border border-gray-700 max-h-[90vh] overflow-y-auto`}
               >
                 {(title || showCloseButton) && (
-                  <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center justify-between mb-3 sm:mb-4">
                     {title && (
                       <Dialog.Title
                         as="h3"
-                        className="text-lg font-medium leading-6 text-white"
+                        className="text-base sm:text-lg font-medium leading-6 text-white pr-2"
                       >
                         {title}
                       </Dialog.Title>
@@ -79,7 +79,7 @@ const Modal: React.FC<ModalProps> = ({
                         size="sm"
                         icon={X}
                         onClick={onClose}
-                        className="ml-auto"
+                        className="ml-auto flex-shrink-0 touch-manipulation"
                       />
                     )}
                   </div>

@@ -114,72 +114,86 @@ export function TestResultsList({
   }, [filteredAndSortedResults]);
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Header with Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-        <div className="flex-1 max-w-md">
-          <SearchInput
-            placeholder="Search tests by name or file..."
-            value={searchQuery}
-            onChange={setSearchQuery}
-            icon={Search}
-          />
-        </div>
+      <div className="flex flex-col gap-3 sm:gap-4">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
+          <div className="flex-1">
+            <SearchInput
+              placeholder="Search tests by name or file..."
+              value={searchQuery}
+              onChange={setSearchQuery}
+              icon={Search}
+            />
+          </div>
 
-        <div className="flex items-center space-x-2">
-          {/* Status Filter */}
-          <div className="flex items-center space-x-2">
-            <Filter className="h-4 w-4 text-gray-400" />
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-              className="bg-gray-800 border border-gray-600 text-white text-sm rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="all">All Status</option>
-              <option value="failed">Failed</option>
-              <option value="passed">Passed</option>
-              <option value="skipped">Skipped</option>
-              <option value="timedOut">Timed Out</option>
-            </select>
+          <div className="flex items-center gap-2">
+            {/* Status Filter */}
+            <div className="flex items-center gap-2 flex-1 sm:flex-none">
+              <Filter className="h-4 w-4 text-gray-400 flex-shrink-0" />
+              <select
+                value={statusFilter}
+                onChange={(e) =>
+                  setStatusFilter(e.target.value as StatusFilter)
+                }
+                className="bg-gray-800 border border-gray-600 text-white text-sm rounded-md px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full sm:w-auto"
+              >
+                <option value="all">All Status</option>
+                <option value="failed">Failed</option>
+                <option value="passed">Passed</option>
+                <option value="skipped">Skipped</option>
+                <option value="timedOut">Timed Out</option>
+              </select>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Sort Controls */}
-      <div className="flex flex-wrap gap-2">
-        <span className="text-sm text-gray-400 self-center">Sort by:</span>
-        {[
-          { field: 'testName' as const, label: 'Test Name' },
-          { field: 'fileName' as const, label: 'File' },
-          { field: 'duration' as const, label: 'Duration' },
-          { field: 'status' as const, label: 'Status' },
-        ].map(({ field, label }) => {
-          const SortIcon = getSortIcon(field);
-          const baseProps = {
-            key: field,
-            variant:
-              sortField === field ? ('primary' as const) : ('ghost' as const),
-            size: 'sm' as const,
-            onClick: () => handleSort(field),
-            iconPosition: 'right' as const,
-            className: 'text-xs',
-          };
+        {/* Sort Controls */}
+        <div className="flex flex-wrap gap-1 sm:gap-2">
+          <span className="text-xs sm:text-sm text-gray-400 self-center mr-1">
+            Sort by:
+          </span>
+          {[
+            { field: 'testName' as const, label: 'Name', shortLabel: 'Name' },
+            { field: 'fileName' as const, label: 'File', shortLabel: 'File' },
+            {
+              field: 'duration' as const,
+              label: 'Duration',
+              shortLabel: 'Time',
+            },
+            { field: 'status' as const, label: 'Status', shortLabel: 'Status' },
+          ].map(({ field, label, shortLabel }) => {
+            const SortIcon = getSortIcon(field);
+            const baseProps = {
+              key: field,
+              variant:
+                sortField === field ? ('primary' as const) : ('ghost' as const),
+              size: 'sm' as const,
+              onClick: () => handleSort(field),
+              iconPosition: 'right' as const,
+              className: 'text-xs',
+            };
 
-          return SortIcon ? (
-            <Button {...baseProps} icon={SortIcon}>
-              {label}
-            </Button>
-          ) : (
-            <Button {...baseProps}>{label}</Button>
-          );
-        })}
+            return SortIcon ? (
+              <Button {...baseProps} icon={SortIcon}>
+                <span className="hidden sm:inline">{label}</span>
+                <span className="sm:hidden">{shortLabel}</span>
+              </Button>
+            ) : (
+              <Button {...baseProps}>
+                <span className="hidden sm:inline">{label}</span>
+                <span className="sm:hidden">{shortLabel}</span>
+              </Button>
+            );
+          })}
+        </div>
       </div>
 
       {/* Results Summary */}
-      <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
-        <div className="flex flex-wrap items-center gap-4 text-sm">
-          <span className="text-gray-300">
-            Showing {stats.total} of {testResults.length} tests
+      <div className="bg-gray-800/50 rounded-lg p-3 sm:p-4 border border-gray-700">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm">
+          <span className="text-gray-300 font-medium">
+            {stats.total} of {testResults.length} tests
           </span>
           {stats.total > 0 && (
             <>

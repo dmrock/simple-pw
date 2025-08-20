@@ -181,10 +181,12 @@ const TestRunsList: React.FC<TestRunsListProps> = ({
     <div className={`space-y-4 ${className}`}>
       {/* Table */}
       <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-700">
-          <h2 className="text-lg font-medium text-white">Test Runs</h2>
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-700">
+          <h2 className="text-base sm:text-lg font-medium text-white">
+            Test Runs
+          </h2>
           {data && (
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-xs sm:text-sm text-gray-400 mt-1">
               Showing {data.data.length} of {data.total} test runs
             </p>
           )}

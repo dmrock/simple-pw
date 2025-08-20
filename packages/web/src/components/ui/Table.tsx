@@ -96,7 +96,7 @@ const Table = <T extends Record<string, unknown>>({
 
   return (
     <div
-      className={`overflow-hidden shadow ring-1 ring-gray-700 md:rounded-lg ${className}`}
+      className={`overflow-hidden shadow ring-1 ring-gray-700 rounded-lg ${className}`}
     >
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-700">
@@ -106,21 +106,21 @@ const Table = <T extends Record<string, unknown>>({
                 <th
                   key={column.key}
                   scope="col"
-                  className={`px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider ${
+                  className={`px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider ${
                     column.hideOnMobile ? 'hidden sm:table-cell' : ''
                   } ${column.headerClassName || ''}`}
                   style={column.width ? { width: column.width } : undefined}
                 >
                   {column.sortable ? (
                     <button
-                      className="group inline-flex items-center space-x-1 hover:text-gray-100"
+                      className="group inline-flex items-center space-x-1 hover:text-gray-100 touch-manipulation"
                       onClick={() => handleSort(column.key)}
                     >
-                      <span>{column.header}</span>
+                      <span className="truncate">{column.header}</span>
                       {getSortIcon(column.key)}
                     </button>
                   ) : (
-                    column.header
+                    <span className="truncate">{column.header}</span>
                   )}
                 </th>
               ))}
@@ -131,7 +131,7 @@ const Table = <T extends Record<string, unknown>>({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-6 py-12 text-center text-sm text-gray-400"
+                  className="px-3 sm:px-6 py-8 sm:py-12 text-center text-sm text-gray-400"
                 >
                   {emptyMessage}
                 </td>
@@ -148,11 +148,13 @@ const Table = <T extends Record<string, unknown>>({
                   {columns.map((column) => (
                     <td
                       key={column.key}
-                      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-300 ${
+                      className={`px-3 sm:px-6 py-3 sm:py-4 text-sm text-gray-300 ${
                         column.hideOnMobile ? 'hidden sm:table-cell' : ''
                       } ${column.className || ''}`}
                     >
-                      {renderCellValue(column, row)}
+                      <div className="truncate max-w-[120px] sm:max-w-none">
+                        {renderCellValue(column, row)}
+                      </div>
                     </td>
                   ))}
                 </tr>

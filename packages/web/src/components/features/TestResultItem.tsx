@@ -46,12 +46,12 @@ export function TestResultItem({
     <div className="border border-gray-700 rounded-lg bg-gray-800/50">
       {/* Main Row */}
       <div
-        className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-700/30 transition-colors"
+        className="flex items-start sm:items-center justify-between p-3 sm:p-4 cursor-pointer hover:bg-gray-700/30 transition-colors touch-manipulation"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div className="flex items-center space-x-4 flex-1 min-w-0">
+        <div className="flex items-start sm:items-center space-x-2 sm:space-x-4 flex-1 min-w-0">
           {/* Expand/Collapse Icon */}
-          <button className="text-gray-400 hover:text-white transition-colors">
+          <button className="text-gray-400 hover:text-white transition-colors mt-0.5 sm:mt-0 flex-shrink-0">
             {isExpanded ? (
               <ChevronDown className="h-4 w-4" />
             ) : (
@@ -61,16 +61,54 @@ export function TestResultItem({
 
           {/* Test Name */}
           <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-white truncate">
+            <div className="text-xs sm:text-sm font-medium text-white truncate">
               {testResult.testName}
             </div>
             <div className="text-xs text-gray-400 truncate">
               {testResult.fileName}
             </div>
+
+            {/* Mobile indicators row */}
+            <div className="flex items-center space-x-2 mt-1 sm:hidden">
+              <StatusBadge status={testResult.status} size="sm" />
+              <div className="flex items-center space-x-1 text-gray-400">
+                <Clock className="h-3 w-3" />
+                <span className="text-xs">
+                  {formatDuration(testResult.duration)}
+                </span>
+              </div>
+              {hasRetries && (
+                <div className="flex items-center space-x-1 text-yellow-400">
+                  <RotateCcw className="h-3 w-3" />
+                  <span className="text-xs">{testResult.retry}</span>
+                </div>
+              )}
+              {hasError && <AlertCircle className="h-3 w-3 text-red-400" />}
+              {hasMedia && (
+                <div className="flex items-center space-x-1">
+                  {testResult.screenshots.length > 0 && (
+                    <div className="flex items-center space-x-1 text-blue-400">
+                      <Image className="h-3 w-3" />
+                      <span className="text-xs">
+                        {testResult.screenshots.length}
+                      </span>
+                    </div>
+                  )}
+                  {testResult.videos.length > 0 && (
+                    <div className="flex items-center space-x-1 text-purple-400">
+                      <Video className="h-3 w-3" />
+                      <span className="text-xs">
+                        {testResult.videos.length}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Status and Indicators */}
-          <div className="flex items-center space-x-3">
+          {/* Desktop Status and Indicators */}
+          <div className="hidden sm:flex items-center space-x-3">
             {hasRetries && (
               <div className="flex items-center space-x-1 text-yellow-400">
                 <RotateCcw className="h-4 w-4" />
@@ -113,7 +151,7 @@ export function TestResultItem({
 
       {/* Expanded Content */}
       {isExpanded && (
-        <div className="border-t border-gray-700 p-4 space-y-4">
+        <div className="border-t border-gray-700 p-3 sm:p-4 space-y-3 sm:space-y-4">
           {/* Error Details */}
           {hasError && (
             <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
@@ -157,7 +195,7 @@ export function TestResultItem({
                       <Image className="h-3 w-3 mr-1" />
                       Screenshots ({testResult.screenshots.length})
                     </h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
                       {testResult.screenshots.map((screenshot, index) => (
                         <Button
                           key={index}
@@ -168,7 +206,7 @@ export function TestResultItem({
                             e.stopPropagation();
                             onViewMedia?.('screenshot', screenshot);
                           }}
-                          className="justify-start text-xs bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700"
+                          className="justify-start text-xs bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700 touch-manipulation"
                         >
                           Screenshot {index + 1}
                         </Button>
@@ -184,7 +222,7 @@ export function TestResultItem({
                       <Video className="h-3 w-3 mr-1" />
                       Videos ({testResult.videos.length})
                     </h5>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-2">
                       {testResult.videos.map((video, index) => (
                         <Button
                           key={index}
@@ -195,7 +233,7 @@ export function TestResultItem({
                             e.stopPropagation();
                             onViewMedia?.('video', video);
                           }}
-                          className="justify-start text-xs bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700"
+                          className="justify-start text-xs bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700 touch-manipulation"
                         >
                           Video {index + 1}
                         </Button>

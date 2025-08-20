@@ -164,24 +164,26 @@ export function TestRunDetails() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header with Navigation */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <Link
           to="/runs"
-          className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
+          className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors touch-manipulation"
         >
           <ArrowLeft className="h-4 w-4" />
-          <span>Back to Test Runs</span>
+          <span className="text-sm sm:text-base">Back to Test Runs</span>
         </Link>
 
-        <div className="flex items-center space-x-4">
-          <RealTimeIndicator
-            isPolling={false} // Not polling by default for details page
-            lastUpdate={lastUpdate}
-            onRefresh={handleRefresh}
-            isRefreshing={isLoading}
-          />
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="hidden sm:block">
+            <RealTimeIndicator
+              isPolling={false} // Not polling by default for details page
+              lastUpdate={lastUpdate}
+              onRefresh={handleRefresh}
+              isRefreshing={isLoading}
+            />
+          </div>
           <Button
             onClick={handleRefresh}
             disabled={isLoading}
@@ -192,7 +194,7 @@ export function TestRunDetails() {
             <RefreshCw
               className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
             />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
         </div>
       </div>
@@ -211,14 +213,18 @@ export function TestRunDetails() {
 
       {/* Test Results */}
       <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-        <div className="px-6 py-4 border-b border-gray-700">
-          <h2 className="text-lg font-medium text-white">Test Results</h2>
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-700">
+          <h2 className="text-base sm:text-lg font-medium text-white">
+            Test Results
+          </h2>
         </div>
-        <div className="p-6">
+        <div className="p-3 sm:p-6">
           {testRun.results.length === 0 ? (
-            <div className="text-center py-8">
-              <p className="text-gray-400 mb-2">No test results found</p>
-              <p className="text-sm text-gray-500">
+            <div className="text-center py-6 sm:py-8">
+              <p className="text-gray-400 mb-2 text-sm sm:text-base">
+                No test results found
+              </p>
+              <p className="text-xs sm:text-sm text-gray-500">
                 This test run doesn't contain any test results.
               </p>
             </div>

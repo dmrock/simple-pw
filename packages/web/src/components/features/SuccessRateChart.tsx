@@ -24,12 +24,14 @@ export function SuccessRateChart({
   if (isLoading) {
     return (
       <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-        <div className="px-6 py-4 border-b border-gray-700">
-          <h2 className="text-lg font-medium text-white">Success Rate Trend</h2>
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-700">
+          <h2 className="text-base sm:text-lg font-medium text-white">
+            Success Rate Trend
+          </h2>
         </div>
-        <div className="p-6">
-          <div className="h-64 flex items-center justify-center bg-gray-700 rounded-lg animate-pulse">
-            <div className="text-gray-400">Loading chart...</div>
+        <div className="p-3 sm:p-6">
+          <div className="h-48 sm:h-64 flex items-center justify-center bg-gray-700 rounded-lg animate-pulse">
+            <div className="text-gray-400 text-sm">Loading chart...</div>
           </div>
         </div>
       </div>
@@ -39,12 +41,14 @@ export function SuccessRateChart({
   if (error) {
     return (
       <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-        <div className="px-6 py-4 border-b border-gray-700">
-          <h2 className="text-lg font-medium text-white">Success Rate Trend</h2>
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-700">
+          <h2 className="text-base sm:text-lg font-medium text-white">
+            Success Rate Trend
+          </h2>
         </div>
-        <div className="p-6">
-          <div className="h-64 flex items-center justify-center bg-red-900/20 border border-red-700 rounded-lg">
-            <p className="text-red-400">Failed to load chart data</p>
+        <div className="p-3 sm:p-6">
+          <div className="h-48 sm:h-64 flex items-center justify-center bg-red-900/20 border border-red-700 rounded-lg">
+            <p className="text-red-400 text-sm">Failed to load chart data</p>
           </div>
         </div>
       </div>
@@ -58,12 +62,14 @@ export function SuccessRateChart({
   ) {
     return (
       <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-        <div className="px-6 py-4 border-b border-gray-700">
-          <h2 className="text-lg font-medium text-white">Success Rate Trend</h2>
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-700">
+          <h2 className="text-base sm:text-lg font-medium text-white">
+            Success Rate Trend
+          </h2>
         </div>
-        <div className="p-6">
-          <div className="h-64 flex items-center justify-center bg-gray-700 rounded-lg">
-            <p className="text-gray-400">No chart data available</p>
+        <div className="p-3 sm:p-6">
+          <div className="h-48 sm:h-64 flex items-center justify-center bg-gray-700 rounded-lg">
+            <p className="text-gray-400 text-sm">No chart data available</p>
           </div>
         </div>
       </div>
@@ -112,28 +118,32 @@ export function SuccessRateChart({
 
   return (
     <div className="bg-gray-800 rounded-lg shadow-lg border border-gray-700">
-      <div className="px-6 py-4 border-b border-gray-700">
-        <h2 className="text-lg font-medium text-white">Success Rate Trend</h2>
+      <div className="px-4 sm:px-6 py-4 border-b border-gray-700">
+        <h2 className="text-base sm:text-lg font-medium text-white">
+          Success Rate Trend
+        </h2>
       </div>
-      <div className="p-6">
-        <div className="h-64">
+      <div className="p-3 sm:p-6">
+        <div className="h-48 sm:h-64">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
               <XAxis
                 dataKey="formattedDate"
                 stroke="#9CA3AF"
-                fontSize={12}
+                fontSize={10}
                 tickLine={false}
                 axisLine={false}
+                interval="preserveStartEnd"
               />
               <YAxis
                 stroke="#9CA3AF"
-                fontSize={12}
+                fontSize={10}
                 tickLine={false}
                 axisLine={false}
                 domain={[0, 100]}
                 tickFormatter={(value) => `${value}%`}
+                width={35}
               />
               <Tooltip content={<CustomTooltip />} />
               <Line
@@ -141,8 +151,8 @@ export function SuccessRateChart({
                 dataKey="successRate"
                 stroke="#10B981"
                 strokeWidth={2}
-                dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2 }}
+                dot={{ fill: '#10B981', strokeWidth: 2, r: 3 }}
+                activeDot={{ r: 5, stroke: '#10B981', strokeWidth: 2 }}
               />
             </LineChart>
           </ResponsiveContainer>

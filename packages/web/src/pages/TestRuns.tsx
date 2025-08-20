@@ -81,17 +81,19 @@ export function TestRuns() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Test Runs</h1>
-        <div className="flex items-center space-x-4">
-          <RealTimeIndicator
-            isPolling={connectionStatus.isConnected}
-            lastUpdate={lastUpdate}
-            onRefresh={handleRefresh}
-            isRefreshing={isLoading}
-          />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-white">Test Runs</h1>
+        <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="hidden sm:block">
+            <RealTimeIndicator
+              isPolling={connectionStatus.isConnected}
+              lastUpdate={lastUpdate}
+              onRefresh={handleRefresh}
+              isRefreshing={isLoading}
+            />
+          </div>
           <Button
             onClick={handleRefresh}
             disabled={isLoading}
@@ -102,7 +104,7 @@ export function TestRuns() {
             <RefreshCw
               className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
             />
-            Refresh
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
         </div>
       </div>

@@ -45,29 +45,37 @@ export function Analytics() {
   }, [refreshData]);
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-white">Analytics</h1>
-        <div className="flex items-center space-x-4">
-          <RealTimeIndicator
-            isPolling={connectionStatus.isConnected}
-            lastUpdate={lastUpdate}
-            onRefresh={handleRefresh}
-            isRefreshing={isLoading}
-          />
-          <Button
-            onClick={handleRefresh}
-            disabled={isLoading}
-            variant="secondary"
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw
-              className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
-            />
-            Refresh
-          </Button>
-          <DateRangePicker value={dateRange} onChange={setDateRange} />
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="text-xl sm:text-2xl font-bold text-white">
+            Analytics
+          </h1>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-4">
+            <div className="hidden sm:block">
+              <RealTimeIndicator
+                isPolling={connectionStatus.isConnected}
+                lastUpdate={lastUpdate}
+                onRefresh={handleRefresh}
+                isRefreshing={isLoading}
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={handleRefresh}
+                disabled={isLoading}
+                variant="secondary"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <RefreshCw
+                  className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
+                />
+                <span className="hidden sm:inline">Refresh</span>
+              </Button>
+              <DateRangePicker value={dateRange} onChange={setDateRange} />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -90,7 +98,7 @@ export function Analytics() {
         error={error}
       />
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         {/* Slowest Tests */}
         <SlowestTestsTable
           data={analyticsData}
