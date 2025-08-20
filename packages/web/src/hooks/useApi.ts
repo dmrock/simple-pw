@@ -1,4 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useEffect, useRef, useCallback } from 'react';
 import { ApiService } from '../services/api';
 import type { TestRunFilters, DateRange } from '../types/api';
 
@@ -15,28 +16,189 @@ export const queryKeys = {
   health: () => ['health'] as const,
 };
 
+// Real-time polling configuration
+interface PollingOptions {
+  enabled?: boolean;
+  pollingInterval?: number;
+  enablePolling?: boolean;
+  refetchOnWindowFocus?: boolean;
+}
+
+// Smart polling hook that adjusts interval based on activity
+function useSmartPolling(
+  refetch: () => void,
+  options: {
+    interval?: number;
+    enabled?: boolean;
+    onError?: (error: Error) => void;
+  } = {}
+) {
+  const { interval = 30000, enabled = true, onError } = options;
+  const intervalRef = useRef<number>();
+  const lastActivityRef = useRef(Date.now());
+  const consecutiveErrorsRef = useRef(0);
+
+  // Track user activity
+  const updateActivity = useCallback(() => {
+    lastActivityRef.current = Date.now();
+  }, []);
+
+  useEffect(() => {
+    const handleActivity = () => updateActivity();
+
+    // Listen for user activity
+    window.addEventListener('mousedown', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    window.addEventListener('scroll', handleActivity);
+    window.addEventListener('touchstart', handleActivity);
+
+    return () => {
+      window.removeEventListener('mousedown', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      window.removeEventListener('scroll', handleActivity);
+      window.removeEventListener('touchstart', handleActivity);
+    };
+  }, [updateActivity]);
+
+  useEffect(() => {
+    if (!enabled) {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+      }
+      return;
+    }
+
+    const poll = async () => {
+      try {
+        const timeSinceActivity = Date.now() - lastActivityRef.current;
+        const isInactive = timeSinceActivity > 5 * 60 * 1000; // 5 minutes
+
+        // Skip polling if user has been inactive for too long
+        if (isInactive) {
+          return;
+        }
+
+        await refetch();
+        consecutiveErrorsRef.current = 0;
+      } catch (error) {
+        consecutiveErrorsRef.current += 1;
+        onError?.(error as Error);
+
+        // Exponential backoff on consecutive errors
+        if (consecutiveErrorsRef.current >= 3) {
+          // Stop polling after 3 consecutive errors
+          if (intervalRef.current) {
+            window.clearInterval(intervalRef.current);
+          }
+          return;
+        }
+      }
+    };
+
+    // Calculate dynamic interval based on errors
+    const dynamicInterval = Math.min(
+      interval * Math.pow(2, consecutiveErrorsRef.current),
+      5 * 60 * 1000 // Max 5 minutes
+    );
+
+    intervalRef.current = window.setInterval(poll, dynamicInterval);
+
+    return () => {
+      if (intervalRef.current) {
+        window.clearInterval(intervalRef.current);
+      }
+    };
+  }, [enabled, interval, refetch, onError]);
+
+  return { updateActivity };
+}
+
 // Test Runs hooks
 export function useTestRuns(
   filters: TestRunFilters = {},
-  options?: { enabled?: boolean }
+  options: PollingOptions = {}
 ) {
-  return useQuery({
+  const {
+    enabled = true,
+    pollingInterval = 30000,
+    enablePolling = true,
+    refetchOnWindowFocus = false,
+  } = options;
+
+  const query = useQuery({
     queryKey: queryKeys.testRuns(filters),
     queryFn: () => ApiService.getTestRuns(filters),
     staleTime: 30 * 1000, // 30 seconds
     gcTime: 5 * 60 * 1000, // 5 minutes
-    ...(options?.enabled !== undefined && { enabled: options.enabled }),
+    enabled,
+    refetchOnWindowFocus,
+    retry: (failureCount, error) => {
+      // Don't retry on client errors
+      if (
+        error &&
+        'code' in error &&
+        typeof error.code === 'string' &&
+        error.code.startsWith('HTTP_4')
+      ) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
+
+  // Smart polling
+  useSmartPolling(query.refetch, {
+    interval: pollingInterval,
+    enabled: enablePolling && enabled && !query.isError,
+    onError: (error) => {
+      console.warn('Polling error for test runs:', error);
+    },
+  });
+
+  return query;
 }
 
-export function useTestRun(id: string, options?: { enabled?: boolean }) {
-  return useQuery({
+export function useTestRun(
+  id: string,
+  options: PollingOptions & { enabled?: boolean } = {}
+) {
+  const {
+    enabled = true,
+    pollingInterval = 60000, // 1 minute for individual test runs
+    enablePolling = false, // Disabled by default for individual runs
+    refetchOnWindowFocus = false,
+  } = options;
+
+  const query = useQuery({
     queryKey: queryKeys.testRun(id),
     queryFn: () => ApiService.getTestRun(id),
     staleTime: 60 * 1000, // 1 minute
     gcTime: 10 * 60 * 1000, // 10 minutes
-    enabled: (options?.enabled ?? true) && !!id,
+    enabled: enabled && !!id,
+    refetchOnWindowFocus,
+    retry: (failureCount, error) => {
+      if (
+        error &&
+        'code' in error &&
+        typeof error.code === 'string' &&
+        error.code.startsWith('HTTP_4')
+      ) {
+        return false;
+      }
+      return failureCount < 2;
+    },
   });
+
+  // Optional polling for test run details
+  useSmartPolling(query.refetch, {
+    interval: pollingInterval,
+    enabled: enablePolling && enabled && !!id && !query.isError,
+    onError: (error) => {
+      console.warn('Polling error for test run:', error);
+    },
+  });
+
+  return query;
 }
 
 // Test Results hooks
@@ -67,15 +229,45 @@ export function useTestResult(
 // Analytics hooks
 export function useAnalytics(
   dateRange?: DateRange,
-  options?: { enabled?: boolean }
+  options: PollingOptions = {}
 ) {
-  return useQuery({
+  const {
+    enabled = true,
+    pollingInterval = 60000, // 1 minute for analytics
+    enablePolling = true,
+    refetchOnWindowFocus = false,
+  } = options;
+
+  const query = useQuery({
     queryKey: queryKeys.analytics(dateRange),
     queryFn: () => ApiService.getAnalytics(dateRange),
     staleTime: 2 * 60 * 1000, // 2 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
-    ...(options?.enabled !== undefined && { enabled: options.enabled }),
+    enabled,
+    refetchOnWindowFocus,
+    retry: (failureCount, error) => {
+      if (
+        error &&
+        'code' in error &&
+        typeof error.code === 'string' &&
+        error.code.startsWith('HTTP_4')
+      ) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
+
+  // Smart polling for analytics
+  useSmartPolling(query.refetch, {
+    interval: pollingInterval,
+    enabled: enablePolling && enabled && !query.isError,
+    onError: (error) => {
+      console.warn('Polling error for analytics:', error);
+    },
+  });
+
+  return query;
 }
 
 // Test History hooks

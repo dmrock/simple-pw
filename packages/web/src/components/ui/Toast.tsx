@@ -52,7 +52,7 @@ export const ToastProvider: React.FC<ToastProviderProps> = ({
 
   const addToast = useCallback(
     (toast: Omit<Toast, 'id'>) => {
-      const id = Math.random().toString(36).substr(2, 9);
+      const id = Math.random().toString(36).substring(2, 11);
       const newToast: Toast = {
         ...toast,
         id,
@@ -132,38 +132,38 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
       case 'success':
         return {
           icon: CheckCircle,
-          bgColor: 'bg-green-50',
-          borderColor: 'border-green-200',
+          bgColor: 'bg-green-900/20',
+          borderColor: 'border-green-500/50',
           iconColor: 'text-green-400',
-          titleColor: 'text-green-800',
-          messageColor: 'text-green-700',
+          titleColor: 'text-green-300',
+          messageColor: 'text-green-200',
         };
       case 'error':
         return {
           icon: XCircle,
-          bgColor: 'bg-red-50',
-          borderColor: 'border-red-200',
+          bgColor: 'bg-red-900/20',
+          borderColor: 'border-red-500/50',
           iconColor: 'text-red-400',
-          titleColor: 'text-red-800',
-          messageColor: 'text-red-700',
+          titleColor: 'text-red-300',
+          messageColor: 'text-red-200',
         };
       case 'warning':
         return {
           icon: AlertCircle,
-          bgColor: 'bg-yellow-50',
-          borderColor: 'border-yellow-200',
+          bgColor: 'bg-yellow-900/20',
+          borderColor: 'border-yellow-500/50',
           iconColor: 'text-yellow-400',
-          titleColor: 'text-yellow-800',
-          messageColor: 'text-yellow-700',
+          titleColor: 'text-yellow-300',
+          messageColor: 'text-yellow-200',
         };
       case 'info':
         return {
           icon: Info,
-          bgColor: 'bg-blue-50',
-          borderColor: 'border-blue-200',
+          bgColor: 'bg-blue-900/20',
+          borderColor: 'border-blue-500/50',
           iconColor: 'text-blue-400',
-          titleColor: 'text-blue-800',
-          messageColor: 'text-blue-700',
+          titleColor: 'text-blue-300',
+          messageColor: 'text-blue-200',
         };
     }
   };
@@ -211,7 +211,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ toast, onRemove }) => {
           </div>
           <div className="ml-4 flex-shrink-0 flex">
             <button
-              className={`inline-flex ${config.messageColor} hover:${config.titleColor} focus:outline-none focus:${config.titleColor}`}
+              className={`inline-flex ${config.messageColor} hover:${config.titleColor} focus:outline-none`}
               onClick={handleRemove}
             >
               <span className="sr-only">Close</span>

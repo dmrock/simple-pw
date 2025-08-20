@@ -23,3 +23,7 @@ export { ErrorBoundary } from './ErrorBoundary';
 
 export { ToastProvider, useToast } from './Toast';
 export type { Toast, ToastType } from './Toast';
+
+export { ConnectionStatus } from './ConnectionStatus';
+
+export { RealTimeIndicator } from './RealTimeIndicator';

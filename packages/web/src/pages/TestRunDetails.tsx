@@ -1,16 +1,34 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, AlertCircle, RefreshCw } from 'lucide-react';
-import { useTestRun } from '../hooks/useApi';
+import { useTestRun, useRealTimeData } from '../hooks';
 import { TestRunHeader } from '../components/features/TestRunHeader';
 import { TestResultsList } from '../components/features/TestResultsList';
 import { MediaViewer } from '../components/features/MediaViewer';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { Button } from '../components/ui/Button';
+import {
+  LoadingSpinner,
+  Button,
+  ConnectionStatus,
+  RealTimeIndicator,
+} from '../components/ui';
 
 export function TestRunDetails() {
   const { id } = useParams<{ id: string }>();
-  const { data: testRun, isLoading, error, refetch } = useTestRun(id!);
+  const {
+    data: testRun,
+    isLoading,
+    error,
+  } = useTestRun(id!, {
+    enablePolling: false, // Disabled by default for details page
+  });
+
+  const { connectionStatus, refreshData, lastUpdate } = useRealTimeData(
+    'testRunDetails',
+    {
+      ...(id && { runId: id }),
+      enablePolling: false, // Can be enabled if needed
+    }
+  );
 
   // Media viewer state
   const [mediaViewer, setMediaViewer] = useState<{
@@ -66,6 +84,10 @@ export function TestRunDetails() {
     setMediaViewer((prev) => ({ ...prev, isOpen: false }));
   };
 
+  const handleRefresh = useCallback(async () => {
+    await refreshData();
+  }, [refreshData]);
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -104,7 +126,7 @@ export function TestRunDetails() {
           <Button
             variant="outline"
             icon={RefreshCw}
-            onClick={() => refetch()}
+            onClick={handleRefresh}
             className="border-red-500/50 text-red-400 hover:bg-red-900/30"
           >
             Try Again
@@ -143,8 +165,8 @@ export function TestRunDetails() {
 
   return (
     <div className="space-y-6">
-      {/* Back Navigation */}
-      <div className="flex items-center space-x-4">
+      {/* Header with Navigation */}
+      <div className="flex items-center justify-between">
         <Link
           to="/runs"
           className="flex items-center space-x-2 text-gray-400 hover:text-white transition-colors"
@@ -152,7 +174,37 @@ export function TestRunDetails() {
           <ArrowLeft className="h-4 w-4" />
           <span>Back to Test Runs</span>
         </Link>
+
+        <div className="flex items-center space-x-4">
+          <RealTimeIndicator
+            isPolling={false} // Not polling by default for details page
+            lastUpdate={lastUpdate}
+            onRefresh={handleRefresh}
+            isRefreshing={isLoading}
+          />
+          <Button
+            onClick={handleRefresh}
+            disabled={isLoading}
+            variant="secondary"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
+            />
+            Refresh
+          </Button>
+        </div>
       </div>
+
+      {/* Connection Status */}
+      <ConnectionStatus
+        isOnline={connectionStatus.isOnline}
+        isConnected={connectionStatus.isConnected}
+        lastConnected={connectionStatus.lastConnected}
+        retryCount={connectionStatus.retryCount}
+        onRetry={connectionStatus.retryConnection}
+      />
 
       {/* Test Run Header */}
       <TestRunHeader testRun={testRun} />

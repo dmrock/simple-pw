@@ -1,9 +1,14 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { RefreshCw } from 'lucide-react';
-import { useTestRuns } from '../hooks/useApi';
+import { useTestRuns, useRealTimeData } from '../hooks';
 import { FilterBar } from '../components/features/FilterBar';
 import { TestRunsList } from '../components/features/TestRunsList';
-import { Button, LoadingSpinner } from '../components/ui';
+import {
+  Button,
+  LoadingSpinner,
+  ConnectionStatus,
+  RealTimeIndicator,
+} from '../components/ui';
 import type { TestRunFilters } from '../types/api';
 
 export function TestRuns() {
@@ -14,7 +19,19 @@ export function TestRuns() {
     sortOrder: 'desc',
   });
 
-  const { data, isLoading, error, refetch } = useTestRuns(filters);
+  const { data, isLoading, error } = useTestRuns(filters, {
+    enablePolling: true,
+    pollingInterval: 30000,
+  });
+
+  const { connectionStatus, refreshData, lastUpdate } = useRealTimeData(
+    'testRuns',
+    {
+      filters,
+      enablePolling: true,
+      pollingInterval: 30000,
+    }
+  );
 
   // Extract unique project names for filter options
   const projectOptions = useMemo(() => {
@@ -49,9 +66,9 @@ export function TestRuns() {
   };
 
   // Handle manual refresh
-  const handleRefresh = () => {
-    refetch();
-  };
+  const handleRefresh = useCallback(async () => {
+    await refreshData();
+  }, [refreshData]);
 
   // Reset filters
   const handleResetFilters = () => {
@@ -63,31 +80,41 @@ export function TestRuns() {
     });
   };
 
-  // Auto-refresh every 30 seconds
-  useEffect(() => {
-    const interval = window.setInterval(() => {
-      refetch();
-    }, 30000);
-
-    return () => window.clearInterval(interval);
-  }, [refetch]);
-
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-white">Test Runs</h1>
-        <Button
-          onClick={handleRefresh}
-          disabled={isLoading}
-          variant="secondary"
-          size="sm"
-          className="flex items-center gap-2"
-        >
-          <RefreshCw className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex items-center space-x-4">
+          <RealTimeIndicator
+            isPolling={connectionStatus.isConnected}
+            lastUpdate={lastUpdate}
+            onRefresh={handleRefresh}
+            isRefreshing={isLoading}
+          />
+          <Button
+            onClick={handleRefresh}
+            disabled={isLoading}
+            variant="secondary"
+            size="sm"
+            className="flex items-center gap-2"
+          >
+            <RefreshCw
+              className={`h-4 w-4 ${isLoading ? 'animate-spin' : ''}`}
+            />
+            Refresh
+          </Button>
+        </div>
       </div>
+
+      {/* Connection Status */}
+      <ConnectionStatus
+        isOnline={connectionStatus.isOnline}
+        isConnected={connectionStatus.isConnected}
+        lastConnected={connectionStatus.lastConnected}
+        retryCount={connectionStatus.retryCount}
+        onRetry={connectionStatus.retryConnection}
+      />
 
       {/* Filter Bar */}
       <FilterBar
