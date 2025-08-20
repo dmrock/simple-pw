@@ -5,7 +5,7 @@ import type { AnalyticsData } from '../../types/api';
 interface FlakyTestsTableProps {
   data: AnalyticsData | undefined;
   isLoading: boolean;
-  error: Error | null;
+  error: Error | null | { message: string };
   onTestClick?: (testName: string) => void;
 }
 

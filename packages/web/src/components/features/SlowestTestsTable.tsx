@@ -4,7 +4,7 @@ import type { AnalyticsData } from '../../types/api';
 interface SlowestTestsTableProps {
   data: AnalyticsData | undefined;
   isLoading: boolean;
-  error: Error | null;
+  error: Error | null | { message: string };
 }
 
 export function SlowestTestsTable({

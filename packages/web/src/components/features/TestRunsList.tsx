@@ -9,20 +9,26 @@ import type { TestRun, PaginatedResponse } from '../../types/api';
 export interface TestRunsListProps {
   data?: PaginatedResponse<TestRun> | undefined;
   loading?: boolean;
+  error?: Error | string | null | { message: string };
   onPageChange: (page: number) => void;
   onSort?: ((key: string) => void) | undefined;
   sortBy?: string | undefined;
   sortDirection?: 'asc' | 'desc' | undefined;
+  onRetry?: () => void;
+  retrying?: boolean;
   className?: string;
 }
 
 const TestRunsList: React.FC<TestRunsListProps> = ({
   data,
   loading = false,
+  error = null,
   onPageChange,
   onSort,
   sortBy,
   sortDirection,
+  onRetry,
+  retrying = false,
   className = '',
 }) => {
   const navigate = useNavigate();
@@ -197,13 +203,18 @@ const TestRunsList: React.FC<TestRunsListProps> = ({
             columns={columns}
             data={data?.data || []}
             loading={loading}
+            error={error}
             sortBy={sortBy}
             sortDirection={sortDirection}
             onSort={onSort}
             onRowClick={handleRowClick}
             rowClassName={getRowClassName}
-            emptyMessage="No test runs found. Test runs will appear here once data is available."
+            emptyTitle="No test runs found"
+            emptyDescription="Test runs will appear here once data is available. Try refreshing or check back later."
+            {...(onRetry && { onRetry })}
+            retrying={retrying}
             className="bg-gray-800"
+            skeletonRows={8}
           />
         </div>
       </div>

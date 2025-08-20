@@ -13,7 +13,7 @@ import type { AnalyticsData } from '../../types/api';
 interface SuccessRateChartProps {
   data: AnalyticsData | undefined;
   isLoading: boolean;
-  error: Error | null;
+  error: Error | null | { message: string };
 }
 
 export function SuccessRateChart({

@@ -51,14 +51,57 @@ apiClient.interceptors.response.use(
       // Server responded with error status
       const { status, data } = error.response;
       const errorData = data as Record<string, unknown>;
-      apiError.message =
-        (errorData?.message as string) || `HTTP ${status} Error`;
+
+      // Enhanced error messages based on status codes
+      switch (status) {
+        case 400:
+          apiError.message = 'Invalid request. Please check your input.';
+          break;
+        case 401:
+          apiError.message = 'Authentication required. Please log in.';
+          break;
+        case 403:
+          apiError.message = 'Access denied. You do not have permission.';
+          break;
+        case 404:
+          apiError.message = 'The requested resource was not found.';
+          break;
+        case 429:
+          apiError.message = 'Too many requests. Please try again later.';
+          break;
+        case 500:
+          apiError.message = 'Server error. Please try again later.';
+          break;
+        case 502:
+          apiError.message =
+            'Bad gateway. The server is temporarily unavailable.';
+          break;
+        case 503:
+          apiError.message = 'Service unavailable. Please try again later.';
+          break;
+        case 504:
+          apiError.message = 'Gateway timeout. The request took too long.';
+          break;
+        default:
+          apiError.message =
+            (errorData?.message as string) || `HTTP ${status} Error`;
+      }
+
       apiError.code = (errorData?.code as string) || `HTTP_${status}`;
       apiError.details = errorData;
     } else if (error.request) {
       // Request was made but no response received
-      apiError.message = 'Network error - please check your connection';
-      apiError.code = 'NETWORK_ERROR';
+      if (error.code === 'ECONNABORTED') {
+        apiError.message = 'Request timeout. Please try again.';
+        apiError.code = 'TIMEOUT_ERROR';
+      } else if (error.code === 'ERR_NETWORK') {
+        apiError.message =
+          'Network error. Please check your internet connection.';
+        apiError.code = 'NETWORK_ERROR';
+      } else {
+        apiError.message = 'Network error - please check your connection';
+        apiError.code = 'NETWORK_ERROR';
+      }
     } else {
       // Something else happened
       apiError.message = error.message || 'Request failed';

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
+import { ErrorEmptyState, NoDataEmptyState } from './EmptyState';
 
 export interface TableColumn<T = Record<string, unknown>> {
   key: string;
@@ -19,10 +20,17 @@ export interface TableProps<T = Record<string, unknown>> {
   sortDirection?: 'asc' | 'desc' | undefined;
   onSort?: ((key: string) => void) | undefined;
   loading?: boolean;
+  error?: Error | string | null | { message: string };
   emptyMessage?: string;
+  emptyTitle?: string;
+  emptyDescription?: string;
   className?: string;
   rowClassName?: ((row: T, index: number) => string) | undefined;
   onRowClick?: ((row: T, index: number) => void) | undefined;
+  onRetry?: () => void;
+  retrying?: boolean;
+  showEmptyState?: boolean;
+  skeletonRows?: number;
 }
 
 const Table = <T extends Record<string, unknown>>({
@@ -32,10 +40,17 @@ const Table = <T extends Record<string, unknown>>({
   sortDirection,
   onSort,
   loading = false,
+  error = null,
   emptyMessage = 'No data available',
+  emptyTitle = 'No data found',
+  emptyDescription = 'There is no data to display at the moment.',
   className = '',
   rowClassName,
   onRowClick,
+  onRetry,
+  retrying = false,
+  showEmptyState = true,
+  skeletonRows = 5,
 }: TableProps<T>) => {
   const handleSort = (key: string) => {
     if (onSort) {
@@ -75,25 +90,102 @@ const Table = <T extends Record<string, unknown>>({
       .join(' ');
   };
 
+  // Loading state with skeleton
   if (loading) {
     return (
       <div
-        className={`overflow-hidden shadow ring-1 ring-gray-700 md:rounded-lg ${className}`}
+        className={`overflow-hidden shadow ring-1 ring-gray-700 rounded-lg ${className}`}
       >
-        <div className="min-w-full divide-y divide-gray-700">
-          <div className="bg-gray-700 px-6 py-3">
-            <div className="h-4 bg-gray-600 rounded animate-pulse"></div>
-          </div>
-          {[...Array(5)].map((_, i) => (
-            <div key={i} className="bg-gray-800 px-6 py-4">
-              <div className="h-4 bg-gray-600 rounded animate-pulse"></div>
-            </div>
-          ))}
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-700">
+            <thead className="bg-gray-700">
+              <tr>
+                {columns.map((column) => (
+                  <th
+                    key={column.key}
+                    scope="col"
+                    className={`px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider ${
+                      column.hideOnMobile ? 'hidden sm:table-cell' : ''
+                    } ${column.headerClassName || ''}`}
+                    style={column.width ? { width: column.width } : undefined}
+                  >
+                    <span className="truncate">{column.header}</span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-gray-800 divide-y divide-gray-700">
+              {Array.from({ length: skeletonRows }).map((_, index) => (
+                <tr key={index}>
+                  {columns.map((column) => (
+                    <td
+                      key={column.key}
+                      className={`px-3 sm:px-6 py-4 ${
+                        column.hideOnMobile ? 'hidden sm:table-cell' : ''
+                      }`}
+                    >
+                      <div className="h-4 bg-gray-600 rounded animate-pulse" />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     );
   }
 
+  // Error state
+  if (error && showEmptyState) {
+    return (
+      <div
+        className={`overflow-hidden shadow ring-1 ring-gray-700 rounded-lg ${className}`}
+      >
+        <div className="overflow-x-auto">
+          <table className="min-w-full divide-y divide-gray-700">
+            <thead className="bg-gray-700">
+              <tr>
+                {columns.map((column) => (
+                  <th
+                    key={column.key}
+                    scope="col"
+                    className={`px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider ${
+                      column.hideOnMobile ? 'hidden sm:table-cell' : ''
+                    } ${column.headerClassName || ''}`}
+                    style={column.width ? { width: column.width } : undefined}
+                  >
+                    <span className="truncate">{column.header}</span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody className="bg-gray-800">
+              <tr>
+                <td colSpan={columns.length} className="p-0">
+                  <ErrorEmptyState
+                    title="Failed to load data"
+                    description={
+                      typeof error === 'string'
+                        ? error
+                        : error instanceof Error
+                          ? error.message
+                          : error?.message || 'An unknown error occurred'
+                    }
+                    {...(onRetry && { onRetry })}
+                    retrying={retrying}
+                    className="py-8"
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
+  // Normal table rendering
   return (
     <div
       className={`overflow-hidden shadow ring-1 ring-gray-700 rounded-lg ${className}`}
@@ -129,11 +221,20 @@ const Table = <T extends Record<string, unknown>>({
           <tbody className="bg-gray-800 divide-y divide-gray-700">
             {data.length === 0 ? (
               <tr>
-                <td
-                  colSpan={columns.length}
-                  className="px-3 sm:px-6 py-8 sm:py-12 text-center text-sm text-gray-400"
-                >
-                  {emptyMessage}
+                <td colSpan={columns.length} className="p-0">
+                  {showEmptyState ? (
+                    <NoDataEmptyState
+                      title={emptyTitle}
+                      description={emptyDescription}
+                      {...(onRetry && { onRefresh: onRetry })}
+                      refreshing={retrying}
+                      className="py-8"
+                    />
+                  ) : (
+                    <div className="px-3 sm:px-6 py-8 sm:py-12 text-center text-sm text-gray-400">
+                      {emptyMessage}
+                    </div>
+                  )}
                 </td>
               </tr>
             ) : (
