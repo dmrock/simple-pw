@@ -58,8 +58,6 @@ class ErrorBoundary extends Component<Props, State> {
   handleRetry = () => {
     this.setState((prevState) => ({
       hasError: false,
-      error: undefined,
-      errorInfo: undefined,
       retryCount: prevState.retryCount + 1,
     }));
   };

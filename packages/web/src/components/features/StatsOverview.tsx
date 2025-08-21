@@ -1,4 +1,6 @@
+import React, { useMemo } from 'react';
 import { StatCardSkeleton, ErrorEmptyState, NoDataEmptyState } from '../ui';
+import { memoize } from '../../utils/performance';
 import type { AnalyticsData } from '../../types/api';
 
 interface StatsOverviewProps {
@@ -9,7 +11,7 @@ interface StatsOverviewProps {
   retrying?: boolean;
 }
 
-export function StatsOverview({
+function StatsOverview({
   data,
   isLoading,
   error,
@@ -39,7 +41,7 @@ export function StatsOverview({
                   ? error.message
                   : error?.message || 'An unknown error occurred'
             }
-            onRetry={onRetry}
+            {...(onRetry && { onRetry })}
             retrying={retrying}
             className="py-8"
           />
@@ -55,7 +57,7 @@ export function StatsOverview({
           <NoDataEmptyState
             title="No analytics data"
             description="Analytics data will appear here once test runs are available."
-            onRefresh={onRetry}
+            {...(onRetry && { onRefresh: onRetry })}
             refreshing={retrying}
             className="py-8"
           />
@@ -64,14 +66,30 @@ export function StatsOverview({
     );
   }
 
-  const formatDuration = (seconds: number): string => {
-    if (seconds < 60) {
-      return `${seconds.toFixed(1)}s`;
-    }
-    const minutes = Math.floor(seconds / 60);
-    const remainingSeconds = seconds % 60;
-    return `${minutes}m ${remainingSeconds.toFixed(0)}s`;
-  };
+  // Memoize expensive formatting calculations
+  const formatDuration = useMemo(
+    () =>
+      memoize((seconds: number): string => {
+        if (seconds < 60) {
+          return `${seconds.toFixed(1)}s`;
+        }
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = seconds % 60;
+        return `${minutes}m ${remainingSeconds.toFixed(0)}s`;
+      }),
+    []
+  );
+
+  // Memoize success rate color calculation
+  const getSuccessRateColor = useMemo(
+    () =>
+      memoize((rate: number): string => {
+        if (rate >= 90) return 'text-green-400';
+        if (rate >= 70) return 'text-yellow-400';
+        return 'text-red-400';
+      }),
+    []
+  );
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -94,13 +112,7 @@ export function StatsOverview({
           Success Rate
         </h3>
         <p
-          className={`text-2xl sm:text-3xl font-bold mt-1 sm:mt-2 ${
-            data.successRate >= 90
-              ? 'text-green-400'
-              : data.successRate >= 70
-                ? 'text-yellow-400'
-                : 'text-red-400'
-          }`}
+          className={`text-2xl sm:text-3xl font-bold mt-1 sm:mt-2 ${getSuccessRateColor(data.successRate)}`}
         >
           {data.successRate.toFixed(1)}%
         </p>
@@ -122,3 +134,26 @@ export function StatsOverview({
     </div>
   );
 }
+
+// Memoize the component for better performance
+const MemoizedStatsOverview = React.memo(
+  StatsOverview,
+  (prevProps, nextProps): boolean => {
+    return (
+      prevProps.isLoading === nextProps.isLoading &&
+      prevProps.error === nextProps.error &&
+      prevProps.retrying === nextProps.retrying &&
+      // Deep comparison for data
+      (prevProps.data === nextProps.data ||
+        (!!prevProps.data &&
+          !!nextProps.data &&
+          prevProps.data.totalRuns === nextProps.data.totalRuns &&
+          prevProps.data.successRate === nextProps.data.successRate &&
+          prevProps.data.averageDuration === nextProps.data.averageDuration))
+    );
+  }
+);
+
+MemoizedStatsOverview.displayName = 'StatsOverview';
+
+export { MemoizedStatsOverview as StatsOverview };

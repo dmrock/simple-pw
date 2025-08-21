@@ -78,8 +78,8 @@ const EmptyState: React.FC<EmptyStateProps> = ({
         <Button
           variant={action.variant || 'primary'}
           onClick={action.onClick}
-          loading={action.loading}
-          icon={action.loading ? RefreshCw : undefined}
+          loading={!!action.loading}
+          {...(action.loading && { icon: RefreshCw })}
         >
           {action.label}
         </Button>
@@ -106,15 +106,13 @@ export const NoDataEmptyState: React.FC<{
     variant="default"
     title={title}
     description={description}
-    action={
-      onRefresh
-        ? {
-            label: refreshing ? 'Refreshing...' : 'Refresh',
-            onClick: onRefresh,
-            loading: refreshing,
-          }
-        : undefined
-    }
+    {...(onRefresh && {
+      action: {
+        label: refreshing ? 'Refreshing...' : 'Refresh',
+        onClick: onRefresh,
+        loading: refreshing,
+      },
+    })}
     className={className}
   />
 );
@@ -132,15 +130,13 @@ export const SearchEmptyState: React.FC<{
         ? `No results found for "${searchTerm}". Try adjusting your search terms or filters.`
         : 'No results found. Try adjusting your search terms or filters.'
     }
-    action={
-      onClearSearch
-        ? {
-            label: 'Clear search',
-            onClick: onClearSearch,
-            variant: 'outline',
-          }
-        : undefined
-    }
+    {...(onClearSearch && {
+      action: {
+        label: 'Clear search',
+        onClick: onClearSearch,
+        variant: 'outline' as const,
+      },
+    })}
     className={className}
   />
 );
@@ -162,15 +158,13 @@ export const ErrorEmptyState: React.FC<{
     variant="error"
     title={title}
     description={description}
-    action={
-      onRetry
-        ? {
-            label: retrying ? 'Retrying...' : 'Try again',
-            onClick: onRetry,
-            loading: retrying,
-          }
-        : undefined
-    }
+    {...(onRetry && {
+      action: {
+        label: retrying ? 'Retrying...' : 'Try again',
+        onClick: onRetry,
+        loading: retrying,
+      },
+    })}
     className={className}
   />
 );
@@ -184,15 +178,13 @@ export const OfflineEmptyState: React.FC<{
     variant="offline"
     title="You're offline"
     description="Please check your internet connection and try again."
-    action={
-      onRetry
-        ? {
-            label: retrying ? 'Connecting...' : 'Try again',
-            onClick: onRetry,
-            loading: retrying,
-          }
-        : undefined
-    }
+    {...(onRetry && {
+      action: {
+        label: retrying ? 'Connecting...' : 'Try again',
+        onClick: onRetry,
+        loading: retrying,
+      },
+    })}
     className={className}
   />
 );

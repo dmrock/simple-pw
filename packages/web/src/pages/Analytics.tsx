@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
+import { useRenderPerformance } from '../utils/performance';
 import { useAnalytics, useRealTimeData, useApiErrorHandler } from '../hooks';
 import { StatsOverview } from '../components/features/StatsOverview';
 import { SuccessRateChart } from '../components/features/SuccessRateChart';
@@ -20,6 +21,9 @@ import {
 import type { DateRange } from '../types/api';
 
 export function Analytics() {
+  // Performance monitoring
+  useRenderPerformance('Analytics');
+
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState<DateRange>(getDefaultDateRange());
 
@@ -44,10 +48,14 @@ export function Analytics() {
     }
   );
 
-  const handleTestClick = (testName: string) => {
-    // Navigate to test history page (future implementation)
-    navigate(`/tests/${encodeURIComponent(testName)}`);
-  };
+  // Memoize expensive navigation callback
+  const handleTestClick = useCallback(
+    (testName: string) => {
+      // Navigate to test history page (future implementation)
+      navigate(`/tests/${encodeURIComponent(testName)}`);
+    },
+    [navigate]
+  );
 
   const handleRefresh = useCallback(async () => {
     try {

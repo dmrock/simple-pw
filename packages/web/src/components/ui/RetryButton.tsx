@@ -116,7 +116,7 @@ export function useRetry(
     onSuccess?: () => void;
   } = {}
 ) {
-  const { maxRetries = 3, retryDelay = 1000, onError, onSuccess } = options;
+  const { maxRetries = 3, onError, onSuccess } = options;
 
   const [isRetrying, setIsRetrying] = useState(false);
   const [retryCount, setRetryCount] = useState(0);

@@ -44,21 +44,21 @@ export function TestRuns() {
     return Array.from(projects).sort();
   }, [data?.data]);
 
-  // Handle filter changes
-  const handleFiltersChange = (newFilters: TestRunFilters) => {
+  // Memoize filter change handler
+  const handleFiltersChange = useCallback((newFilters: TestRunFilters) => {
     setFilters({
       ...newFilters,
       page: newFilters.page || 1, // Reset to page 1 when filters change
     });
-  };
+  }, []);
 
-  // Handle pagination
-  const handlePageChange = (page: number) => {
+  // Memoize pagination handler
+  const handlePageChange = useCallback((page: number) => {
     setFilters((prev) => ({ ...prev, page }));
-  };
+  }, []);
 
-  // Handle sorting
-  const handleSort = (key: string) => {
+  // Memoize sorting handler
+  const handleSort = useCallback((key: string) => {
     setFilters((prev) => ({
       ...prev,
       sortBy: key as 'createdAt' | 'duration' | 'projectName' | 'status',
@@ -66,7 +66,7 @@ export function TestRuns() {
         prev.sortBy === key && prev.sortOrder === 'asc' ? 'desc' : 'asc',
       page: 1, // Reset to page 1 when sorting changes
     }));
-  };
+  }, []);
 
   // Handle manual refresh
   const handleRefresh = useCallback(async () => {
@@ -85,15 +85,15 @@ export function TestRuns() {
     });
   }, [errorHandler, refetch]);
 
-  // Reset filters
-  const handleResetFilters = () => {
+  // Memoize reset filters handler
+  const handleResetFilters = useCallback(() => {
     setFilters({
       page: 1,
       limit: 20,
       sortBy: 'createdAt',
       sortOrder: 'desc',
     });
-  };
+  }, []);
 
   return (
     <ErrorBoundary level="page">

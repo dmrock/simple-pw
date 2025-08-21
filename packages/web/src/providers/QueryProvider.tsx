@@ -3,13 +3,41 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { ReactNode } from 'react';
 import { env } from '../config/env';
 
-// Create a client with optimized defaults for real-time updates
+// Enhanced cache configuration for different data types
+const getCacheConfig = (dataType: 'static' | 'dynamic' | 'realtime') => {
+  switch (dataType) {
+    case 'static':
+      // For rarely changing data (e.g., test history)
+      return {
+        staleTime: 10 * 60 * 1000, // 10 minutes
+        gcTime: 30 * 60 * 1000, // 30 minutes
+      };
+    case 'dynamic':
+      // For moderately changing data (e.g., analytics)
+      return {
+        staleTime: 2 * 60 * 1000, // 2 minutes
+        gcTime: 10 * 60 * 1000, // 10 minutes
+      };
+    case 'realtime':
+      // For frequently changing data (e.g., test runs)
+      return {
+        staleTime: 30 * 1000, // 30 seconds
+        gcTime: 5 * 60 * 1000, // 5 minutes
+      };
+    default:
+      return {
+        staleTime: 30 * 1000,
+        gcTime: 5 * 60 * 1000,
+      };
+  }
+};
+
+// Create a client with optimized defaults and enhanced caching
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // Global defaults for all queries
-      staleTime: 30 * 1000, // 30 seconds
-      gcTime: 5 * 60 * 1000, // 5 minutes (formerly cacheTime)
+      // Global defaults for all queries (realtime by default)
+      ...getCacheConfig('realtime'),
       retry: (failureCount, error: Error) => {
         // Don't retry on 4xx errors (client errors)
         if (
@@ -31,6 +59,13 @@ const queryClient = new QueryClient({
       refetchOnMount: true, // Refetch when component mounts
       // Network mode for better offline handling
       networkMode: 'online',
+      // Enable background refetching for better UX
+      refetchInterval: false, // Disabled by default, enabled per query
+      refetchIntervalInBackground: false,
+      // Optimize for performance
+      structuralSharing: true, // Enable structural sharing for better performance
+      // Persist queries in background
+      notifyOnChangeProps: 'all', // Only notify when tracked props change
     },
     mutations: {
       retry: (failureCount, error: Error) => {
@@ -47,6 +82,16 @@ const queryClient = new QueryClient({
       networkMode: 'online',
     },
   },
+});
+
+// Add query-specific cache configurations
+queryClient.setQueryDefaults(['analytics'], getCacheConfig('dynamic'));
+queryClient.setQueryDefaults(['testHistory'], getCacheConfig('static'));
+queryClient.setQueryDefaults(['testRuns'], getCacheConfig('realtime'));
+queryClient.setQueryDefaults(['testRun'], getCacheConfig('dynamic'));
+queryClient.setQueryDefaults(['health'], {
+  staleTime: 30 * 1000,
+  gcTime: 2 * 60 * 1000,
 });
 
 interface QueryProviderProps {

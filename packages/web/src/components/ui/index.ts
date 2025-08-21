@@ -57,3 +57,12 @@ export {
   FullScreenLoadingState,
 } from './AppLoadingState';
 export type { AppLoadingStateProps } from './AppLoadingState';
+
+// Performance optimization components
+export {
+  withLazyLoading,
+  ConditionalLazy,
+  useLazyComponent,
+  preloadComponent,
+  ProgressiveEnhancement,
+} from './LazyComponent';

@@ -15,9 +15,13 @@ class ErrorHandlerService implements GlobalErrorHandler {
   private maxQueueSize = 50;
 
   handleError(error: Error, context?: string): void {
-    const errorEntry = {
+    const errorEntry: {
+      error: Error;
+      context?: string;
+      timestamp: Date;
+    } = {
       error,
-      context,
+      ...(context && { context }),
       timestamp: new Date(),
     };
 

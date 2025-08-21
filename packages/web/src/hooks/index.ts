@@ -5,3 +5,4 @@ export * from './useConnectionNotifications';
 export * from './useOptimisticUpdates';
 export * from './useRealTimeData';
 export * from './useErrorHandler';
+export * from './usePerformanceOptimization';
