@@ -2,6 +2,17 @@ import { useState, useEffect } from 'react';
 import { PerformanceMonitor, getMemoryUsage } from '../../utils/performance';
 import { env } from '../../config/env';
 
+interface MetricData {
+  average: number;
+  max: number;
+  min: number;
+  count: number;
+}
+
+interface NavigationTiming {
+  transferSize?: number;
+}
+
 interface PerformanceMonitorProps {
   enabled?: boolean;
   position?: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
@@ -12,20 +23,20 @@ export function PerformanceMonitorComponent({
   position = 'bottom-right',
 }: PerformanceMonitorProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const [metrics, setMetrics] = useState<Record<string, any>>({});
+  const [metrics, setMetrics] = useState<Record<string, MetricData | null>>({});
   const [memoryUsage, setMemoryUsage] =
     useState<ReturnType<typeof getMemoryUsage>>(null);
 
   useEffect(() => {
     if (!enabled) return;
 
-    const interval = setInterval(() => {
+    const interval = window.setInterval(() => {
       const monitor = PerformanceMonitor.getInstance();
       setMetrics(monitor.getAllMetrics());
       setMemoryUsage(getMemoryUsage());
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, [enabled]);
 
   if (!enabled) return null;
@@ -156,9 +167,9 @@ export function usePerformanceWarnings() {
       }
     };
 
-    const interval = setInterval(checkPerformance, 10000); // Check every 10 seconds
+    const interval = window.setInterval(checkPerformance, 10000); // Check every 10 seconds
 
-    return () => clearInterval(interval);
+    return () => window.clearInterval(interval);
   }, []);
 }
 
@@ -170,9 +181,9 @@ export function BundleSizeWarning() {
     if (!env.DEV_MODE) return;
 
     // Estimate bundle size from performance navigation API
-    const navigation = performance.getEntriesByType(
+    const navigation = window.performance.getEntriesByType(
       'navigation'
-    )[0] as PerformanceNavigationTiming;
+    )[0] as NavigationTiming;
     if (navigation) {
       const transferSize = navigation.transferSize || 0;
       setBundleSize(Math.round(transferSize / 1024)); // KB
