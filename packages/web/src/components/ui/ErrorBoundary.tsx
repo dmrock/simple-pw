@@ -88,7 +88,7 @@ class ErrorBoundary extends Component<Props, State> {
 
     // Copy to clipboard for now (in production, send to error reporting service)
     navigator.clipboard.writeText(JSON.stringify(report, null, 2)).then(() => {
-      alert('Error report copied to clipboard');
+      window.alert('Error report copied to clipboard');
     });
   };
 
