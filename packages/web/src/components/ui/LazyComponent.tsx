@@ -3,6 +3,26 @@ import { LoadingSpinner } from './LoadingSpinner';
 import { ErrorBoundary } from './ErrorBoundary';
 import { trackBundleLoad } from '../../utils/performance';
 
+// Type definitions for missing DOM APIs
+interface WindowWithTimers {
+  setTimeout: (callback: () => void, delay: number) => number;
+  clearTimeout: (id: number) => void;
+  IntersectionObserver?: new (
+    callback: (entries: IntersectionObserverEntry[]) => void,
+    options?: { threshold?: number }
+  ) => IntersectionObserver;
+}
+
+interface IntersectionObserver {
+  observe: (target: object | null) => void;
+  unobserve: (target: object | null) => void;
+  disconnect: () => void;
+}
+
+interface IntersectionObserverEntry {
+  isIntersecting: boolean;
+}
+
 interface LazyComponentProps {
   fallback?: React.ReactNode;
   errorFallback?: React.ReactNode;
@@ -113,14 +133,23 @@ export function useLazyComponent<P extends object>(
   );
   const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<Error | null>(null);
-  const targetRef = React.useRef<HTMLDivElement | null>(null);
+  const targetRef = React.useRef<React.ElementRef<'div'>>(null);
 
   React.useEffect(() => {
     const target = targetRef.current;
     if (!target || shouldLoad) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
+    // Type assertion for IntersectionObserver
+    const windowWithIO = window as WindowWithTimers;
+    const IntersectionObserverConstructor = windowWithIO.IntersectionObserver;
+    if (!IntersectionObserverConstructor) {
+      // Fallback: load immediately if IntersectionObserver is not supported
+      setShouldLoad(true);
+      return;
+    }
+
+    const observer = new IntersectionObserverConstructor(
+      (entries: IntersectionObserverEntry[]) => {
         const entry = entries[0];
         if (entry?.isIntersecting) {
           setShouldLoad(true);
@@ -205,11 +234,12 @@ export function ProgressiveEnhancement({
 
   React.useEffect(() => {
     if (delay > 0 && condition) {
-      const timer = setTimeout(() => {
+      const windowWithTimers = window as WindowWithTimers;
+      const timer = windowWithTimers.setTimeout(() => {
         setShowEnhanced(true);
       }, delay);
 
-      return () => clearTimeout(timer);
+      return () => windowWithTimers.clearTimeout(timer);
     }
     return undefined;
   }, [delay, condition]);
