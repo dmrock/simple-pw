@@ -107,6 +107,10 @@ export async function testRunsRoutes(fastify: FastifyInstance) {
     const pageNum = parseInt(page, 10) || 1;
     const limitNum = parseInt(limit, 10) || 20;
 
+    // Get total count
+    const total = await fastify.prisma.testRun.count();
+
+    // Get paginated runs
     const runs = await fastify.prisma.testRun.findMany({
       skip: (pageNum - 1) * limitNum,
       take: limitNum,
@@ -116,7 +120,15 @@ export async function testRunsRoutes(fastify: FastifyInstance) {
       },
     });
 
-    reply.send(runs);
+    const totalPages = Math.ceil(total / limitNum);
+
+    reply.send({
+      data: runs,
+      total,
+      page: pageNum,
+      limit: limitNum,
+      totalPages,
+    });
   });
 
   // Get specific test run

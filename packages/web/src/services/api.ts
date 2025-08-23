@@ -131,20 +131,20 @@ export class ApiService {
     });
 
     const response = await apiClient.get<PaginatedResponse<TestRun>>(
-      `/runs?${params}`
+      `/api/test-runs?${params}`
     );
     return response.data;
   }
 
   static async getTestRun(id: string): Promise<TestRun> {
-    const response = await apiClient.get<TestRun>(`/runs/${id}`);
+    const response = await apiClient.get<TestRun>(`/api/test-runs/${id}`);
     return response.data;
   }
 
   // Test Results endpoints
   static async getTestResults(runId: string): Promise<TestResult[]> {
     const response = await apiClient.get<TestResult[]>(
-      `/runs/${runId}/results`
+      `/api/test-runs/${runId}/results`
     );
     return response.data;
   }
@@ -154,7 +154,7 @@ export class ApiService {
     resultId: string
   ): Promise<TestResult> {
     const response = await apiClient.get<TestResult>(
-      `/runs/${runId}/results/${resultId}`
+      `/api/test-runs/${runId}/results/${resultId}`
     );
     return response.data;
   }
